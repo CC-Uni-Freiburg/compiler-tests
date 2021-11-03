@@ -1144,4 +1144,5 @@ def run_tests(
     )
 
     if successful_tests == total_tests and successful_passes == total_passes:
-        print("ALL TESTS PASSED! :D")
+        return True
+    return False
