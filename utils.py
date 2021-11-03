@@ -873,8 +873,9 @@ def compile_and_test(
     trace(program)
     trace("")
 
-    trace("\n***************\n type check     \n***************\n")
-    type_check_P(program)
+    if type_check_P:
+        trace("\n***************\n type check     \n***************\n")
+        type_check_P(program)
 
     if hasattr(compiler, "shrink"):
         trace("\n**********\n shrink \n**********\n")
@@ -943,31 +944,18 @@ def compile_and_test(
     trace(pseudo_x86)
     trace("")
     total_passes += 1
-    test_x86 = False
-    if test_x86:
-        successful_passes += test_pass(
-            "select instructions", interp_x86, program_root, pseudo_x86, compiler_name
-        )
 
     trace("\n**********\n assign \n**********\n")
     almost_x86 = compiler.assign_homes(pseudo_x86)
     trace(almost_x86)
     trace("")
     total_passes += 1
-    if test_x86:
-        successful_passes += test_pass(
-            "assign homes", interp_x86, program_root, almost_x86, compiler_name
-        )
 
     trace("\n**********\n patch \n**********\n")
     x86 = compiler.patch_instructions(almost_x86)
     trace(x86)
     trace("")
     total_passes += 1
-    if test_x86:
-        successful_passes += test_pass(
-            "patch instructions", interp_x86, program_root, x86, compiler_name
-        )
 
     trace("\n**********\n prelude and conclusion \n**********\n")
     x86 = compiler.prelude_and_conclusion(x86)
@@ -987,7 +975,6 @@ def compile_and_test(
         stdout = sys.stdout
         sys.stdin = open(program_root + ".in", "r")
         sys.stdout = open(program_root + ".out", "w")
-        interp_x86(x86)
         sys.stdin = stdin
         sys.stdout = stdout
     else:
