@@ -864,7 +864,6 @@ def compile_and_test(
 ):
     total_passes = 0
     successful_passes = 0
-    from interp_x86.eval_x86 import interp_x86
 
     program_root = program_filename.split(".")[0]
     with open(program_filename) as source:
