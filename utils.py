@@ -173,7 +173,7 @@ Or.__repr__ = repr_Or
 
 
 def str_BinOp(self):
-    return str(self.left) + " " + str(self.op) + " " + str(self.right)
+    return "(" + str(self.left) + " " + str(self.op) + " " + str(self.right) + ")"
 
 
 BinOp.__str__ = str_BinOp
@@ -195,7 +195,7 @@ BinOp.__repr__ = repr_BinOp
 
 
 def str_BoolOp(self):
-    return str(self.values[0]) + " " + str(self.op) + " " + str(self.values[1])
+    return "(" + str(self.values[0]) + " " + str(self.op) + " " + str(self.values[1]) + ")"
 
 
 BoolOp.__str__ = str_BoolOp
