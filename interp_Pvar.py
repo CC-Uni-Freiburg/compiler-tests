@@ -8,6 +8,10 @@ class InterpPvar:
         l = self.interp_exp(left, env)
         r = self.interp_exp(right, env)
         return l + r
+      case BinOp(left, Sub(), right):
+        l = self.interp_exp(left, env)
+        r = self.interp_exp(right, env)
+        return l - r
       case UnaryOp(USub(), v):
         return - self.interp_exp(v, env)
       case Name(id):
