@@ -2,6 +2,7 @@ import os
 import sys
 from sys import platform
 import ast
+from filecmp import cmp
 from ast import *
 
 ################################################################################
@@ -813,6 +814,21 @@ def is_python_extension(filename):
         return False
 
 
+def ensure_final_newline(filename):
+    # check whether file is empty
+    if os.stat(filename).st_size != 0:
+        with open(filename, "r+b") as f:
+            # must open as b to seek from end; read last character
+            f.seek(-1, 2)
+            b = f.read(1)
+            newline = bytes('\n', 'utf-8')
+            if b != newline:
+                f.write(newline)
+
+
+compare_files = lambda file1, file2: cmp(file1, file2, shallow=False)
+
+
 # Given the `ast` output of a pass and a test program (root) name,
 # runs the interpreter on the program and compares the output to the
 # expected "golden" output.
@@ -864,6 +880,7 @@ def compile_and_test(
 ):
     total_passes = 0
     successful_passes = 0
+    from interp_x86.eval_x86 import interp_x86
 
     program_root = program_filename.split(".")[0]
     with open(program_filename) as source:
@@ -873,8 +890,8 @@ def compile_and_test(
     trace(program)
     trace("")
 
+    trace("\n***************\n type check     \n***************\n")
     if type_check_P:
-        trace("\n***************\n type check     \n***************\n")
         type_check_P(program)
 
     if hasattr(compiler, "shrink"):
@@ -944,18 +961,31 @@ def compile_and_test(
     trace(pseudo_x86)
     trace("")
     total_passes += 1
+    test_x86 = True
+    if test_x86:
+        successful_passes += test_pass(
+            "select instructions", interp_x86, program_root, pseudo_x86, compiler_name
+        )
 
     trace("\n**********\n assign \n**********\n")
     almost_x86 = compiler.assign_homes(pseudo_x86)
     trace(almost_x86)
     trace("")
     total_passes += 1
+    if test_x86:
+        successful_passes += test_pass(
+            "assign homes", interp_x86, program_root, almost_x86, compiler_name
+        )
 
     trace("\n**********\n patch \n**********\n")
     x86 = compiler.patch_instructions(almost_x86)
     trace(x86)
     trace("")
     total_passes += 1
+    if test_x86:
+        successful_passes += test_pass(
+            "patch instructions", interp_x86, program_root, x86, compiler_name
+        )
 
     trace("\n**********\n prelude and conclusion \n**********\n")
     x86 = compiler.prelude_and_conclusion(x86)
@@ -975,6 +1005,7 @@ def compile_and_test(
         stdout = sys.stdout
         sys.stdin = open(program_root + ".in", "r")
         sys.stdout = open(program_root + ".out", "w")
+        interp_x86(x86)
         sys.stdin = stdin
         sys.stdout = stdout
     else:
@@ -983,10 +1014,10 @@ def compile_and_test(
         output_file = program_root + ".out"
         os.system("./a.out < " + input_file + " > " + output_file)
 
-    os.system(sed + " -i '$a\\' " + program_root + ".out")
-    os.system(sed + " -i '$a\\' " + program_root + ".golden")
-    result = os.system("diff " + program_root + ".out " + program_root + ".golden")
-    if result == 0:
+    ensure_final_newline(program_root + '.out')
+    ensure_final_newline(program_root + '.golden')
+    result = compare_files(program_root + ".out", program_root + ".golden")
+    if result:
         successful_passes += 1
         return (successful_passes, total_passes, 1)
     else:
