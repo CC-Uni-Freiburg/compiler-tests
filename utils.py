@@ -881,6 +881,9 @@ def compile_and_test(
     total_passes = 0
     successful_passes = 0
     from interp_x86.eval_x86 import interp_x86
+    import importlib
+    lark = importlib.util.find_spec("lark")
+    test_x86 = lark is not None
 
     program_root = program_filename.split(".")[0]
     with open(program_filename) as source:
@@ -961,7 +964,6 @@ def compile_and_test(
     trace(pseudo_x86)
     trace("")
     total_passes += 1
-    test_x86 = True
     if test_x86:
         successful_passes += test_pass(
             "select instructions", interp_x86, program_root, pseudo_x86, compiler_name
