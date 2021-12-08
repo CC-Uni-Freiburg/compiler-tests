@@ -845,7 +845,7 @@ def test_pass(passname, interp, program_root, ast, compiler_name):
     ensure_final_newline(program_root + '.out')
     ensure_final_newline(program_root + '.golden')
     result = compare_files(output_file, program_root + ".golden")
-    if result == 0:
+    if result:
         trace(
             "compiler "
             + compiler_name
