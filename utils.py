@@ -842,9 +842,9 @@ def test_pass(passname, interp, program_root, ast, compiler_name):
     interp(ast)
     sys.stdin = stdin
     sys.stdout = stdout
-    os.system(sed + " -i '$a\\' " + program_root + ".out")
-    os.system(sed + " -i '$a\\' " + program_root + ".golden")
-    result = os.system("diff " + output_file + " " + program_root + ".golden")
+    ensure_final_newline(program_root + '.out')
+    ensure_final_newline(program_root + '.golden')
+    result = compare_files(output_file, program_root + ".golden")
     if result == 0:
         trace(
             "compiler "
@@ -1179,6 +1179,6 @@ def run_tests(
         + lang
     )
 
-    if successful_tests == total_tests: #  and successful_passes == _:
+    if successful_tests == total_tests and successful_passes == total_passes:
         return True
     return False
