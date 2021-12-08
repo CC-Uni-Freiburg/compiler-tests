@@ -967,8 +967,8 @@ def compile_and_test(
     pseudo_x86 = compiler.select_instructions(program)
     trace(pseudo_x86)
     trace("")
-    total_passes += 1
     if test_x86:
+        total_passes += 1
         successful_passes += test_pass(
             "select instructions", interp_x86, program_root, pseudo_x86, compiler_name
         )
@@ -977,8 +977,8 @@ def compile_and_test(
     almost_x86 = compiler.assign_homes(pseudo_x86)
     trace(almost_x86)
     trace("")
-    total_passes += 1
     if test_x86:
+        total_passes += 1
         successful_passes += test_pass(
             "assign homes", interp_x86, program_root, almost_x86, compiler_name
         )
@@ -987,8 +987,8 @@ def compile_and_test(
     x86 = compiler.patch_instructions(almost_x86)
     trace(x86)
     trace("")
-    total_passes += 1
     if test_x86:
+        total_passes += 1
         successful_passes += test_pass(
             "patch instructions", interp_x86, program_root, x86, compiler_name
         )
