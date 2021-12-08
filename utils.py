@@ -958,9 +958,10 @@ def compile_and_test(
             "explicate control", interp_C, program_root, program, compiler_name
         )
 
-    if type_check_C:
-        trace("\n**********\n type check C \n**********\n")
-        type_check_C(program)
+        if type_check_C:
+            trace("\n**********\n type check C \n**********\n")
+            type_check_C(program)
+
 
     trace("\n**********\n select \n**********\n")
     pseudo_x86 = compiler.select_instructions(program)
