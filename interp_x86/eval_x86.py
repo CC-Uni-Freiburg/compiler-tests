@@ -4,6 +4,7 @@
 from collections import defaultdict
 from dataclasses import dataclass
 from utils import *
+from lark import Tree
 
 from .parser_x86 import x86_parser, x86_parser_instrs
 from .convert_x86 import convert_program
@@ -161,7 +162,7 @@ class X86Emulator:
         elif a.data == 'var_a':
             return self.variables[str(a.children[0])]
         elif a.data == 'int_a':
-            return self.eval_imm(a.children[0])
+            return int(a.children[0])
         elif a.data == 'mem_a':
             offset, reg = a.children
             addr = self.registers[reg]
@@ -243,6 +244,17 @@ class X86Emulator:
                 a1 = instr.children[0]
                 v1 = self.eval_arg(a1)
                 self.store_arg(a1, (- v1))
+
+            elif instr.data == 'sarq':
+                a1 = instr.children[0]
+                v1 = self.eval_arg(a1)
+                self.store_arg(a1, v1 >> 1)
+
+            elif instr.data == 'andq':
+                a1, a2 = instr.children
+                v1 = self.eval_arg(a1)
+                v2 = self.eval_arg(a2)
+                self.store_arg(a2, v1 & v2)
 
             elif instr.data in ['jmp', 'je', 'jne', 'jl', 'jle', 'jg', 'jge']:
                 target = str(instr.children[0])
