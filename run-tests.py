@@ -17,9 +17,9 @@ compiler = compiler.Compiler()
 
 
 enable_tracing()
-results = [run_tests("var", compiler, "var", type_check_Lvar.TypeCheckLvar().type_check, interp_Pvar.InterpPvar().interp_P, type_check_Cif.TypeCheckCif().type_check, interp_Cif.InterpCif().interp)]
+results = [run_tests("var", compiler, "var", type_check_Lif.TypeCheckLif().type_check, interp_Pvar.InterpPvar().interp_P, type_check_Cif.TypeCheckCif().type_check, interp_Cif.InterpCif().interp)]
 if hasattr(compiler, "allocate_registers"):
-    results.append(run_tests("regalloc", compiler, "regalloc", type_check_Lvar.TypeCheckLvar().type_check, interp_Pvar.InterpPvar().interp_P, type_check_Cif.TypeCheckCif().type_check, interp_Cif.InterpCif().interp))
+    results.append(run_tests("regalloc", compiler, "regalloc", type_check_Lif.TypeCheckLif().type_check, interp_Pvar.InterpPvar().interp_P, type_check_Cif.TypeCheckCif().type_check, interp_Cif.InterpCif().interp))
 if hasattr(compiler, "shrink"):
     results.append(run_tests("lif", compiler, "lif", type_check_Lif.TypeCheckLif().type_check, interp_Lif.InterpLif().interp, type_check_Cif.TypeCheckCif().type_check, interp_Cif.InterpCif().interp))
 if hasattr(compiler, "expose_allocation"):
