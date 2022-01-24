@@ -24,7 +24,7 @@ class TypeCheckLtup(TypeCheckLwhile):
         l = self.type_check_exp(left, env)
         r = self.type_check_exp(right, env)
         self.check_type_equal(l, r, e)
-        return bool
+        return BoolType()
       case Tuple(es, Load()):
         ts = [self.type_check_exp(e, env) for e in es]
         e.has_type = TupleType(ts)
@@ -32,7 +32,7 @@ class TypeCheckLtup(TypeCheckLwhile):
       case Subscript(tup, Constant(index), Load()):
         tup_ty = self.type_check_exp(tup, env)
         index_ty = self.type_check_exp(Constant(index), env)
-        self.check_type_equal(index_ty, int, index)
+        self.check_type_equal(index_ty, IntType(), index)
         match tup_ty:
           case TupleType(ts):
             return ts[index]
@@ -42,7 +42,7 @@ class TypeCheckLtup(TypeCheckLwhile):
         tup_t = self.type_check_exp(tup, env)
         match tup_t:
           case TupleType(ts):
-            return int
+            return IntType()
           case Bottom():
             return Bottom()
           case _:

@@ -403,6 +403,13 @@ class X86Emulator:
                 self.eval_instrs(blocks[target], blocks, output)
                 return # after jumping, toss continuation
 
+            elif instr.data == 'tail_jmp':
+                # Treat like indirect call
+                pop = Tree("popq", [Tree("reg_a", ["rbp"])])
+                indirect_jmp = Tree("indirect_jmp", [instr.children[0]])
+                self.eval_instrs([pop, indirect_jmp], blocks, output)
+                return
+
             else:
                 raise RuntimeError(f'Unknown instruction: {instr.data}')
 
