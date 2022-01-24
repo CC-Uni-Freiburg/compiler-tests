@@ -3,6 +3,7 @@ import sys
 from sys import platform
 import ast
 from filecmp import cmp
+from dataclasses import dataclass
 from ast import *
 
 ################################################################################
@@ -498,7 +499,8 @@ def str_FunctionDef(self):
             body += "".join([str(s) for s in ss])
             dedent()
     dedent()
-    return indent_stmt() + "def " + self.name + "(" + params + "):\n" + body
+    return indent_stmt() + 'def ' + self.name + '(' + params + ')' + \
+        ' -> ' + str(self.returns) + ':\n' + body + '\n'
 
 
 def repr_FunctionDef(self):
@@ -685,6 +687,24 @@ class GlobalValue(expr):
     def __repr__(self):
         return "GlobalValue(" + repr(self.name) + ")"
 
+class Type:
+    pass
+
+@dataclass(eq=True)
+class IntType(Type):
+    def __str__(self):
+        return 'int'
+
+
+@dataclass(eq=True)
+class BoolType(Type):
+    def __str__(self):
+        return 'bool'
+
+@dataclass(eq=True)
+class VoidType(Type):
+    def __str__(self):
+        return 'void'
 
 class Bottom:
     def __eq__(self, other):
@@ -742,18 +762,21 @@ class FunctionType:
         return result and self.ret_type == other.ret_type
 
 
+@dataclass
 class FunRef:
-    __match_args__ = ("name",)
-
-    def __init__(self, name):
-        self.name = name
-
+    name : str
+    arity : int
+    __match_args__ = ("name","arity")
     def __str__(self):
-        return self.name + "(%rip)"
+        return '{' + self.name + '}'
 
-    def __repr__(self):
-        return "FunRef(" + self.name + ")"
-
+@dataclass
+class TailCall:
+    func : expr
+    args : list[expr]
+    __match_args__ = ("func","args")
+    def __str__(self):
+        return indent_stmt() + 'tail ' + str(self.func) + '(' + ', '.join([str(e) for e in self.args]) + ')\n'
 
 ################################################################################
 # Miscellaneous Auxiliary Functions
