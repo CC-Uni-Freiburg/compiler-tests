@@ -924,6 +924,10 @@ def run_tests(
     print('passes: ' + repr(successful_passes) + '/' + repr(total_passes) \
           + ' for compiler ' + compiler_name + ' on language ' + lang)
 
+    if successful_tests == total_tests:
+        return True
+    return False
+
 def get_all_tests_for(lang):
     '''Collect all the test program file names for language `lang`.'''
     homedir = os.getcwd()
