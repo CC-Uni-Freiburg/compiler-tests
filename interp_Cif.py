@@ -9,9 +9,10 @@ class InterpCif(InterpLif):
         return
     match ss[0]:
       case Return(value):
-        return self.interp_exp(value, env)
+        return Return(self.interp_exp(value, env))
       case Goto(label):
-        return self.interp_stmts(self.blocks[label], env)
+        return Goto(label)
+        # return self.interp_stmts(self.blocks[label_name(label)], env)
       case _:
         return super().interp_stmts(ss, env)
     
@@ -20,5 +21,6 @@ class InterpCif(InterpLif):
       case CProgram(blocks):
         env = {}
         self.blocks = blocks
-        self.interp_stmts(blocks[label_name('start')], env)
-    
+        r = self.interp_stmts(blocks[label_name('start')], env)
+        while isinstance(r, Goto):
+          r = self.interp_stmts(self.blocks[label_name(r.label)], env)

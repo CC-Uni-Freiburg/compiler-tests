@@ -60,7 +60,7 @@ class TypeCheckLfun(TypeCheckLtup):
     
   def type_check_exp(self, e, env):
     match e:
-      case FunRef(id):
+      case FunRef(id, arity):
         return env[id]
       case Call(Name('input_int'), []):
         return super().type_check_exp(e, env)      

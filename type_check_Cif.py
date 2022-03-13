@@ -1,5 +1,6 @@
 from ast import *
-from utils import CProgram, Goto, trace, Bottom, Let, IntType, BoolType
+from utils import CProgram, Goto, trace, Bottom, IntType, BoolType, Begin
+# from utils import Let
 import copy
 
 class TypeCheckCif:
@@ -11,6 +12,15 @@ class TypeCheckCif:
       raise Exception('error: ' + repr(t1) + ' != ' + repr(t2) \
                       + ' in ' + repr(e))
 
+  def combine_types(self, t1, t2):
+    match (t1, t2):
+      case (Bottom(), _):
+        return t2
+      case (_, Bottom()):
+        return t1
+      case _:
+        return t1
+    
   def type_check_atm(self, e, env):
     match e:
       case Name(id):
@@ -62,11 +72,14 @@ class TypeCheckCif:
         return BoolType()
       case Call(Name('input_int'), []):
         return IntType()
-      case Let(Name(x), rhs, body):
-        t = self.type_check_exp(rhs, env)
-        new_env = dict(env)
-        new_env[x] = t
-        return self.type_check_exp(body, new_env)
+      # case Let(Name(x), rhs, body):
+      #   t = self.type_check_exp(rhs, env)
+      #   new_env = dict(env)
+      #   new_env[x] = t
+      #   return self.type_check_exp(body, new_env)
+      case Begin(ss, e):
+        self.type_check_stmts(ss, env)
+        return self.type_check_exp(e, env)
       case _:
         raise Exception('error in type_check_exp, unexpected ' + repr(e))
 
@@ -79,7 +92,9 @@ class TypeCheckCif:
       case Assign([lhs], value):
         t = self.type_check_exp(value, env)
         if lhs.id in env:
-          self.check_type_equal(env.get(lhs.id, Bottom()), t, s)
+          lhs_ty = env.get(lhs.id, Bottom())
+          self.check_type_equal(lhs_ty, t, s)
+          env[lhs.id] = self.combine_types(t, lhs_ty)
         else:
           env[lhs.id] = t
       case Expr(Call(Name('print'), [arg])):

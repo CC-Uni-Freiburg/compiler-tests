@@ -11,6 +11,8 @@ class InterpCtup(InterpCif):
       case Subscript(tup, index, Load()):
         t = self.interp_exp(tup, env)
         n = self.interp_exp(index, env)
+        if n < 0:
+          raise IndexError('less than zero')
         return t[n]
       case Allocate(length, typ):
         array = [None] * length
@@ -35,6 +37,8 @@ class InterpCtup(InterpCif):
       case Assign([Subscript(tup, index)], value):
         tup = self.interp_exp(tup, env)
         index = self.interp_exp(index, env)
+        if index < 0:
+          raise IndexError('less than zero')
         tup[index] = self.interp_exp(value, env)
         return self.interp_stmts(ss[1:], env)
       case _:

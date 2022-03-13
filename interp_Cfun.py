@@ -12,10 +12,21 @@ class InterpCfun(InterpCtup):
           self.blocks = blocks
           # trace('apply_fun ' + name)
           # trace(blocks.keys())
-          new_env = {x: v for (x,v) in env.items()}
+          new_env = env.copy()
           for (x,arg) in zip(xs, args):
               new_env[x] = arg
-          ret = self.interp_stmts(blocks[label_name(name + 'start')], new_env)
+
+          next_label = name + 'start'
+          ret = None
+          while True:
+            r = self.interp_stmts(blocks[label_name(next_label)], new_env)
+            match r:
+              case Goto(label):
+                next_label = label
+              case Return(retval):
+                ret = retval
+                break
+
           self.blocks = old_blocks
           return ret
         case _:
@@ -31,7 +42,7 @@ class InterpCfun(InterpCtup):
         f = self.interp_exp(func, env)
         vs = [self.interp_exp(arg, env) for arg in args]
         return self.apply_fun(f, vs, e)
-      case FunRef(id):
+      case FunRef(id, arity):
         return env[id]
       case _:
         return super().interp_exp(e, env)

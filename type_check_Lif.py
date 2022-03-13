@@ -43,10 +43,13 @@ class TypeCheckLif(TypeCheckLvar):
         r = self.type_check_exp(right, env)
         self.check_type_equal(r, IntType(), right)
         return BoolType()
-      case Let(Name(x), rhs, body):
-        t = self.type_check_exp(rhs, env)
-        new_env = dict(env); new_env[x] = t
-        return self.type_check_exp(body, new_env)
+      # case Let(Name(x), rhs, body):
+      #   t = self.type_check_exp(rhs, env)
+      #   new_env = dict(env); new_env[x] = t
+      #   return self.type_check_exp(body, new_env)
+      case Begin(ss, e):
+        self.type_check_stmts(ss, env)
+        return self.type_check_exp(e, env)
       case _:
         return super().type_check_exp(e, env)
 
