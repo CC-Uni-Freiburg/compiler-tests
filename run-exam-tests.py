@@ -2,7 +2,7 @@ from type_check_Lexam import TypeCheckLexam
 from interp_Lexam import InterpLexam
 from type_check_Cexam import TypeCheckCexam
 from interp_Cexam import InterpCexam
-from utils_exam import enable_tracing, run_tests
+from utils import enable_tracing, run_tests
 import sys
 sys.path.append("..")
 from compiler_Lexam import CompilerLexam
