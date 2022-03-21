@@ -82,7 +82,7 @@ class TypeCheckLfun(TypeCheckLtup):
 
   def type_check_stmts(self, ss, env):
     if len(ss) == 0:
-      return
+      return Bottom()
     match ss[0]:
       case FunctionDef(name, params, body, dl, returns, comment):
         new_env = {x: t for (x,t) in env.items()}

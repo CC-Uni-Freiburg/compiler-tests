@@ -79,7 +79,7 @@ class TypeCheckLexam(TypeCheckLfun):
 
   def type_check_stmts(self, ss, env):
     if len(ss) == 0:
-      return VoidType()
+      return Bottom()
     match ss[0]:
       case Assign([Subscript(tup, index, Store())], value):
         tup_ty = self.type_check_exp(tup, env)
