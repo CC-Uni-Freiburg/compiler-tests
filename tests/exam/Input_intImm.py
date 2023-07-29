@@ -1,0 +1,21 @@
+print(420 % input_int()) # 6
+print(input_int() % 69) # 6
+print(input_int() % 69) # 0
+print(0 % input_int()) # 0
+print(input_int() % 69) # -6
+print(-420 % input_int()) # -6
+print(input_int() % -69) # 6
+print(420 % input_int()) # 6
+print(input_int() % -69) # -6
+print(-420 % input_int()) # -6
+print(input_int() % -69) # 0
+print(0 % input_int()) # 0
+# Jetz nochmal alles für maximal große Werte.
+print(input_int() % -9223372036854775807) # 0
+print(9223372036854775807 % input_int()) # 0
+print(input_int() % 9223372036854775807) # 0
+print(-9223372036854775807 % input_int()) # 0
+print(input_int() % -9223372036854775807) # 0
+print(0 % input_int()) # 0
+print(input_int() % 9223372036854775807) # 0
+print(0 % input_int()) # 0

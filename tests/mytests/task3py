@@ -1,0 +1,112 @@
+#name=simple
+#in=
+#golden=3 0 1 -1 3 -1 -3 42
+def func(a: list[int]) -> int:
+    return min(a)
+
+print(len([1,2,3]))
+print(func([0,1,2]))
+a = [1,2,3]
+print(a[0])
+a[0] = -1
+print(a[0])
+a[1] = a[2]
+print(a[1])
+print(func(a))
+a[1] = -2
+a[2] = -3
+print(min(a))
+b = [True, False, True]
+if b[0]:
+    print(42)
+
+#name=edge
+#in=
+#golden=0 1 0 0 1
+def func(a: list[None]) -> int:
+    return 1
+
+x=[]
+print(len(x))
+print(func(x))
+print(min([0,0,0]))
+print([0][0])
+a=[0]
+[a][0][0] = 1
+print(a[0])
+
+#name=large
+#in=
+#golden=42 42 1 -1 3 3 1
+def func1(a: list[list[list[int]]]) -> list[list[int]]:
+    return a[0]
+
+def func2(a: list[list[int]]) -> list[int]:
+    return a[0]
+
+def func3(a: list[int]) -> int:
+    return a[0]
+
+def gunc(a: tuple[int, int]) -> int:
+    return a[0]
+
+a = [[[42,3],[2]],[[4,4,5]],[[43]]]
+print(a[0][0][0])
+print(func3(func2(func1(a))))
+[[[a]]][0][0][0][0][0] = [1,2]
+print(func2(a[0])[0])
+[[[[0]]], [a[0]]][1][0][0][0] = -1
+print(a[0][0][0])
+b = [([(3,2),(1,3)],4)]
+print(b[0][0][0][0])
+print(gunc(b[0][0][0]))
+print(len([len([len([len(a), len(b)])])]))
+
+#name=complex
+#in=2
+#in=0
+#in=1
+#in=3
+#golden=2 4 1 0
+def identity(x: int) -> int:
+    len([input_int()]) if x == 0 else min([1])
+    return x * 1
+
+def copy(x: list[int], y: list[int], z: Callable[[int], int]) -> list[int]:
+    i = 0
+    while i < len(x):
+        y[z(i)] = x[z(i)] * 2
+        i = i + 1
+    return y
+
+def get_min_row(x: list[list[int]]) -> list[tuple[int, int]]:
+    i = 0
+    minimum = x[0 % 10][0] // 1
+    min_row = 0
+    while i < len(x):
+        if min(x[i]) < minimum:
+            minimum = min(x[i] if 10 * min(x[i]) >= 0 else [0])
+            min_row = i
+        i = i + 1
+    return [(min_row, minimum)]
+
+def calc_sum(x: list[list[int]], y: list[list[bool]], z: Callable[[list[list[int]]], list[tuple[int, int]]]) -> int:
+    i = 0
+    s = 0
+    while i < len(x):
+        j = 0
+        while j < len(x[i]):
+            s = s + (x[i][j] if y[i][j] else z(x)[0][1])
+            j = j + 1
+        j = 0
+        i = i + 1
+    return s
+
+x = [1,2,3,4,5]
+y = [input_int(),x[0] if input_int() == 0 else 10 * x[1] + input_int() // 1, x[2], x[3], x[4]]
+p = [[1,2,3],[-1,-2,-3],[3,4,5 * 5]]
+q = [[True, True, False], [False, False, True], [False, False, False]]
+print(y[0])
+print(copy(x, y, identity)[1])
+print(get_min_row(p)[0][0])
+print(calc_sum(p, q, get_min_row))

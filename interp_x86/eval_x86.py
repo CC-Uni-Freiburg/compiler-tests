@@ -3,11 +3,12 @@
 
 from collections import defaultdict
 from dataclasses import dataclass
-from utils import *
-from lark import Tree
 
-from .parser_x86 import x86_parser, x86_parser_instrs
+from utils import *
+
 from .convert_x86 import convert_program
+from .parser_x86 import x86_parser, x86_parser_instrs
+
 
 def interp_x86(program):
     x86_program = convert_program(program)
@@ -15,7 +16,7 @@ def interp_x86(program):
     x86_output = emu.eval_program(x86_program)
     for s in x86_output:
         print(s, end='')
-    
+
 @dataclass
 class FunPointer:
     fun_name: str
@@ -30,14 +31,14 @@ class X86Emulator:
         self.registers['rsp'] = 1000
 
         self.global_vals = {}
-    
+
     def log(self, s):
         if self.logging:
             print(s)
-    
+
     def parse_and_eval_program(self, s):
         p = x86_parser.parse(s)
-        
+
     def eval_program(self, p):
         assert p.data == 'prog'
         blocks = {}
@@ -52,7 +53,7 @@ class X86Emulator:
             self.global_vals[name] = FunPointer(name)
 
         self.log('========== STARTING EXECUTION ==============================')
-    
+
         # start evaluating at "main" or at "start"
         if label_name('main') in blocks.keys():
             self.eval_instrs(blocks[label_name('main')], blocks,
@@ -60,7 +61,7 @@ class X86Emulator:
         elif label_name('start') in blocks.keys():
             self.eval_instrs(blocks[label_name('start')], blocks,
                              output)
-            
+
 
         self.log('FINAL STATE:')
         if self.logging:
@@ -84,13 +85,13 @@ class X86Emulator:
         orig_registers = self.registers.copy()
         orig_variables = self.variables.copy()
 
-        
+
 
         self.log('Executing instructions:')
         self.log(s)
 
         self.log('========== STARTING EXECUTION ==============================')
-    
+
         # start evaluating at "main"
         self.eval_instrs(p.children, blocks, output)
 
@@ -114,7 +115,7 @@ class X86Emulator:
 
         changes_df = pd.DataFrame(all_changes,
                                   columns=['Location', 'Old', 'New'])
-        
+
         return changes_df
 
     def diff_dicts(self, d_after, d_orig):
@@ -123,10 +124,10 @@ class X86Emulator:
             if d_orig[k] != d_after[k]:
                 keys_diff.append(k)
         return keys_diff
-        
+
     def print_state(self):
         import pandas as pd
-        
+
         pd.set_option("display.max_rows", None)
         memory = [[ f'mem {k}', self.memory[k] ] \
                   for k in sorted(self.memory.keys()) ]
@@ -147,26 +148,38 @@ class X86Emulator:
         for k, v in mem.items():
             self.log(f' {k}:\t {v}')
 
-    def eval_imm(self, e):
+    def eval_imm(self, e) -> int:
         if e.data == 'int_a':
-            return int(e.children[0])
-        elif e.data == 'neg_a':
-            return -self.eval_imm(e.children[0])
+           v = int(e.children[0])
+           if is_int64(v):
+               return v
+           else: 
+               raise Exception('eval_imm: invalid immediate:', v)
+             
+        # if e.data == 'int_a':
+        #     return int(e.children[0])
+        # elif e.data == 'neg_a':
+        #     return -self.eval_imm(e.children[0])
         else:
             raise Exception('eval_imm: unknown immediate:', e)
 
-    
+
     def eval_arg(self, a):
         if a.data == 'reg_a':
             return self.registers[str(a.children[0])]
         elif a.data == 'var_a':
             return self.variables[str(a.children[0])]
+        # elif a.data == 'int_a' or a.data == 'neg_a':
+        #     return self.eval_imm(a)
         elif a.data == 'int_a':
-            return int(a.children[0])
+            return self.eval_imm(a)
+        elif a.data == 'neg_a':
+            return neg64(self.eval_imm(a.children[0]))
         elif a.data == 'mem_a':
             offset, reg = a.children
             addr = self.registers[reg]
-            offset_addr = addr + self.eval_imm(offset)
+            offset_addr = add64(addr,self.eval_imm(offset))
+            # offset_addr = addr + self.eval_imm(offset)
             return self.memory[offset_addr]
         elif a.data == 'global_val_a':
             loc, reg = a.children
@@ -183,7 +196,8 @@ class X86Emulator:
         elif a.data == 'mem_a':
             offset, reg = a.children
             addr = self.registers[reg]
-            offset_addr = addr + self.eval_imm(offset)
+            #offset_addr = addr + self.eval_imm(offset)
+            offset_addr = add64(addr,self.eval_imm(offset))
             self.memory[offset_addr] = v
         elif a.data == 'direct_mem_a':
             reg = a.children[0]
@@ -226,35 +240,48 @@ class X86Emulator:
                 a1, a2 = instr.children
                 v1 = self.eval_arg(a1)
                 v2 = self.eval_arg(a2)
-                self.store_arg(a2, v1 + v2)
+                self.store_arg(a2, add64(v1, v2))
 
             elif instr.data == 'subq':
                 a1, a2 = instr.children
                 v1 = self.eval_arg(a1)
                 v2 = self.eval_arg(a2)
-                self.store_arg(a2, v2 - v1)
+                self.store_arg(a2, sub64(v2, v1))
 
             elif instr.data == 'xorq':
                 a1, a2 = instr.children
                 v1 = self.eval_arg(a1)
                 v2 = self.eval_arg(a2)
-                self.store_arg(a2, v1 ^ v2)
+                self.store_arg(a2, xor64(v1, v2))
 
             elif instr.data == 'negq':
                 a1 = instr.children[0]
                 v1 = self.eval_arg(a1)
-                self.store_arg(a1, (- v1))
+                self.store_arg(a1, neg64(v1))
 
             elif instr.data == 'sarq':
-                a1 = instr.children[0]
+                a1, a2 = instr.children
                 v1 = self.eval_arg(a1)
-                self.store_arg(a1, v1 >> 1)
+                v2 = self.eval_arg(a2)
+                self.store_arg(a2, v2 >> v1)
+
+            elif instr.data == 'salq':
+                a1, a2 = instr.children
+                v1 = self.eval_arg(a1)
+                v2 = self.eval_arg(a2)
+                self.store_arg(a2, v2 << v1)
 
             elif instr.data == 'andq':
                 a1, a2 = instr.children
                 v1 = self.eval_arg(a1)
                 v2 = self.eval_arg(a2)
                 self.store_arg(a2, v1 & v2)
+
+            elif instr.data == 'orq':
+                a1, a2 = instr.children
+                v1 = self.eval_arg(a1)
+                v2 = self.eval_arg(a2)
+                self.store_arg(a2, v1 | v2)
 
             elif instr.data in ['jmp', 'je', 'jne', 'jl', 'jle', 'jg', 'jge']:
                 target = str(instr.children[0])
@@ -317,11 +344,11 @@ class X86Emulator:
                         print(self.print_state())
 
                 elif target == label_name('read_int'):
-                    self.registers['rax'] = int(input())
+                    self.registers['rax'] = input_int()
                     self.log(f'CALL TO read_int: {self.registers["rax"]}')
                     if self.logging:
                         print(self.print_state())
-                    
+
                 elif target == 'initialize':
                     self.log(f'CALL TO initialize: {self.registers["rdi"]}, {self.registers["rsi"]}')
                     rootstack_size = self.registers['rdi']
@@ -403,19 +430,12 @@ class X86Emulator:
                 self.eval_instrs(blocks[target], blocks, output)
                 return # after jumping, toss continuation
 
-            elif instr.data == 'tail_jmp':
-                # Treat like indirect call
-                pop = Tree("popq", [Tree("reg_a", ["rbp"])])
-                indirect_jmp = Tree("indirect_jmp", [instr.children[0]])
-                self.eval_instrs([pop, indirect_jmp], blocks, output)
-                return
-
             else:
                 raise RuntimeError(f'Unknown instruction: {instr.data}')
 
             if self.logging:
                 print(self.print_state())
-                
+
 
 
 

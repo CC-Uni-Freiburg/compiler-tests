@@ -1,4 +1,6 @@
-__pycache__
-*/*.out
-*/*.s
-
+a.out
+runtime.o
+*.s
+*.out
+*.swp
+__pycache__/
