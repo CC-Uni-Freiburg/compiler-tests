@@ -17,4 +17,4 @@ o = 1
 p = 1
 q = 42
 r = 1
-print(a*b*c*d*e*f*g*h*i*j*k*l*m*n*o*p*q*r)
+print(a * b * c * d * e * f * g * h * i * j * k * l * m * n * o * p * q * r)

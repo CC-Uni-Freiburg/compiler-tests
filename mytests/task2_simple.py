@@ -1,5 +1,5 @@
-#in=
-#golden=42 -1 -2 -3
+# in=
+# golden=42 -1 -2 -3
 i = 0
 while i < 42:
     i = i + 1

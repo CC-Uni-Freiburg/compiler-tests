@@ -15,4 +15,4 @@ else:
 
 
 print(x[1] if x[1 + 0] == 42 else 0)
-print(x[2+1] if len([[1, 2, 3], [4, 5, 6]][0 + 0]) > 0 else 0)
+print(x[2 + 1] if len([[1, 2, 3], [4, 5, 6]][0 + 0]) > 0 else 0)

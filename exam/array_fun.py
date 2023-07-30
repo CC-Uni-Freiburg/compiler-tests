@@ -5,7 +5,7 @@ def func(x: list[list[int]]) -> int:
 
 
 def inc2DVec(vec: list[int]) -> list[int]:
-    return [vec[0]+1, vec[1] + 1]
+    return [vec[0] + 1, vec[1] + 1]
 
 
 print(func([[0]]))

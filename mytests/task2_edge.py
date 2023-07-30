@@ -1,5 +1,5 @@
-#in=
-#golden=1 42
+# in=
+# golden=1 42
 while False:
     print(-1)
 print(1)

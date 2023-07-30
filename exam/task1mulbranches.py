@@ -1,8 +1,8 @@
 # Author: Alexander Pfefferle
-#in=17
-#in=2551
-#in=157219
-#golden=32319990146228877828701
+# in=17
+# in=2551
+# in=157219
+# golden=32319990146228877828701
 a = input_int()
 b = 19
 a = a * b

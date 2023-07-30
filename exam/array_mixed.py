@@ -1,6 +1,6 @@
 # Author: Pascal Walter 4924063
 def ret_42(m: int) -> int:
-    return ((42 * m) // m)
+    return (42 * m) // m
 
 
 def test_everything(n: int) -> int:

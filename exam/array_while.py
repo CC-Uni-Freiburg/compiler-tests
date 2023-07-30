@@ -13,6 +13,6 @@ print(x[0])
 
 
 k = 0
-while [2,2][k] > k+1:
+while [2, 2][k] > k + 1:
     k = k + 1
 print(x[0])

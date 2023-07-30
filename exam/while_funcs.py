@@ -6,8 +6,10 @@ def inc(x: int) -> int:
         i = i + 1
     return x
 
+
 def add_one(x: int) -> int:
     return x + 1
+
 
 def negative(x: int) -> bool:
     return x < 0

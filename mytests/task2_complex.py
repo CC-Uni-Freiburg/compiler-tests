@@ -1,11 +1,11 @@
-#in=1
-#in=2
-#in=3
-#in=4
-#in=5
-#in=6
-#in=-10
-#golden=1 3
+# in=1
+# in=2
+# in=3
+# in=4
+# in=5
+# in=6
+# in=-10
+# golden=1 3
 def func(x: int) -> int:
     while x != 0:
         if x < 0:
@@ -13,6 +13,7 @@ def func(x: int) -> int:
             return 20
         x = x - 1
     return x
+
 
 i = 2
 count = 0
